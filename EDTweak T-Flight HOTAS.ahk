@@ -1,11 +1,6 @@
 /*
 Thrustmaster T-Flight HOTAS (X) / Top Gun Afterburner II Configuration Script for EDTWeak / UJRC
 
-Usage:
-1) Unbind ALL joystick controls in Elite: Dangerous (ED) by clicking on them and tapping Escape
-2) Set your ED controls to match those in the ED BINDINGS section. You should only need to add the ones marked "Non Default"
-3) If you wish to have EDTweak disable Occulus Rift / TrackIR, set the key that toggles your head tracker in HEADTRACKER_KEY
-
 */
 
 SetKeyDelay,0,100
@@ -94,6 +89,8 @@ elite.Add({type: "UJRC_Shift", button: "1Joy7", shiftmode: "targ1"})
 elite.Add({type: "UJRC_Shift", button: "1Joy6", shiftmode: "targ2"})
 
 ; Add Custom Elite controls
+; Configure Elite UI Shift.
+; UI Shift + POV L/R = L/R menu. UI Shift + U/D = change tabs. Click UI Shift = Exit UI
 elite.Add({type: "UJRC_Elite_UI_Shift", button: "1Joy8", shiftmode: "eliteui", exit_key: "Lshift", headtracker_toggle: HEADTRACKER_KEY})
 elite.Add({type: "UJRC_Elite_POV", button: "1JoyPOV", shiftmode: "eliteui", key_array: ["e","3","q","1"], state_mask: [0,2,0,1], allow_diagonals: 0 })
 elite.Add({type: "UJRC_Elite_UI_NavMode", button: "", shiftmode: "elitenav"})

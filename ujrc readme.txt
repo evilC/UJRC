@@ -1,5 +1,8 @@
 UJRC Readme
 
+Download Link:
+http://evilc.com/files/ahk/ujrc/ujrc.zip
+
 Usage:
 1) Decide which buttons you wish to have shifted / unshifted modes for and which buttons you wish to use for shift.
 2) Unbind ALL these buttons in your game by clicking on them and tapping Escape
