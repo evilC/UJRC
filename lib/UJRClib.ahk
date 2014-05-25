@@ -1,5 +1,5 @@
 /*
-UJRC - Universal Joystick Remapper Companion library v 1.0.0
+UJRC - Universal Joystick Remapper Companion library v 1.0.1
 By evilc@evilc.com
 
 */
@@ -148,7 +148,7 @@ Class UJRC_Button {
 		this.shiftmode := parms.shiftmode
 		this.key := parms.key
 
-		return this
+		return this 
 	}
 
 	Process(){
@@ -170,11 +170,11 @@ Class UJRC_Button {
 				if (this.BeforeUp()){
 					;key := this.key " up"
 					;Send {%key%}
-					controller.Send(this.key " up")
+					this.controller.Send(this.key " up")
 					this.state := 0
 				}
 			}
-		}
+		}    
 	}
 
 	; Methods intended to be extended
