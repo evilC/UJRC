@@ -1,5 +1,5 @@
 /*
-Thrustmaster T-Flight HOTAS (X) / Top Gun Afterburner II configuration script for EDTWeak / UJRC
+Thrustmaster T-Flight HOTAS (X) / Top Gun Afterburner II Configuration Script for EDTWeak / UJRC
 
 Usage:
 1) Unbind ALL joystick controls in Elite: Dangerous (ED) by clicking on them and tapping Escape
@@ -12,6 +12,10 @@ SetKeyDelay,0,100
 
 ; ========================================================================================================
 ; User configuration
+
+limit_app := 0					; Remappings work in any app
+;limit_app := "fWin32Utils"		; Limit remappings to only work in Elite
+;limit_app := "Notepad"			; Limit remappings to only work in Notepad
 
 ; ED BINDINGS
 ; Set which keys do what in ED here
@@ -45,7 +49,7 @@ HEADTRACKER_KEY := "F9"			; Default for TrackIR
 ; Declare a new controller
 ;elite := New UJRC_Controller({limit_app: "fWin32Utils"})	; limit keys to elite dangerous
 ;elite := New UJRC_Controller({limit_app: "Notepad"})		; limit keys to Notepad (testing mode)
-elite := New UJRC_Controller({limit_app: 0})				; remapping works in any application. Keys are not hidden in this mode
+elite := New UJRC_Controller({limit_app: limit_app})				; remapping works in any application. Keys are not hidden in this mode
 
 ; Configure setup of your Joystick here
 
