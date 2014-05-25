@@ -1,0 +1,10 @@
+UJRC Changelog
+
+Key:
+! : Warning
+* : Comment
+= : Change / Fix
++ : Added feature
+
+1.0.0 25th May 2014
++ Initial version
