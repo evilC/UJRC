@@ -74,9 +74,10 @@ elite.Add({type: "UJRC_Button", stick: 1, button: "2", shiftmode: "power", key: 
 
 ; Side Button by Trigger - Flight Assist in ALL MODES
 elite.Add({type: "UJRC_Button", stick: 1, button: "3", shiftmode: "default", key: FLIGHT_ASSIST})
-elite.Add({type: "UJRC_Button", stick: 1, button: "3", shiftmode: "power", key: FLIGHT_ASSIST})
-elite.Add({type: "UJRC_Button", stick: 1, button: "3", shiftmode: "targ1", key: FLIGHT_ASSIST})
-elite.Add({type: "UJRC_Button", stick: 1, button: "3", shiftmode: "targ2", key: FLIGHT_ASSIST})
+elite.Add({type: "UJRC_Button", stick: 1, button: "3", shiftmode: "targ1", key: "1"})
+;elite.Add({type: "UJRC_Button", stick: 1, button: "3", shiftmode: "power", key: FLIGHT_ASSIST})
+;elite.Add({type: "UJRC_Button", stick: 1, button: "3", shiftmode: "targ1", key: FLIGHT_ASSIST})
+;elite.Add({type: "UJRC_Button", stick: 1, button: "3", shiftmode: "targ2", key: FLIGHT_ASSIST})
 
 ; Side Button by Secondary Fire - default: Engine Boost, power mode: Silent Running, targ2 mode: Deploy Heat Sink
 elite.Add({type: "UJRC_Button", stick: 1, button: "4", shiftmode: "default", key: ENGINE_BOOST})

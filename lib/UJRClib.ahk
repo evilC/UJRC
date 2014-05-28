@@ -1,5 +1,5 @@
 /*
-UJRC - Universal Joystick Remapper Companion library v 1.0.1
+UJRC - Universal Joystick Remapper Companion library v 1.0.2
 By evilc@evilc.com
 
 */
@@ -16,6 +16,9 @@ SetKeyDelay,0,100
 Class UJRC_Controller {
 	__New(parms){
 		this.version := 1.0.0
+		this.started_up := 0
+		this.button_counts := {}			; How many shift modes each button is in
+		this.button_modes := {}				; Which shift modes each button is in
 		this.limit_app := parms.limit_app
 		this.shift_states := {}
 		this.shift_buttons := []
@@ -29,13 +32,48 @@ Class UJRC_Controller {
 
 	Add(parms){
 		parms.controller := this
+		parms.shiftmode := StrLower(parms.shiftmode)
 
+		; Create control object
 		tmp := parms.type
 		obj := New %tmp%(parms)
+
+		; Post creation stuff
+		if (parms.shiftmode == "default"){
+			obj.is_default := 1
+		}
+		obj.buttonstring := StrLower(obj.buttonstring)
 
 	}
 
 	Heartbeat(){
+		if (!this.started_up){
+			this.button_counts := {}
+			this.button_modes := {}
+			Loop % this.pov_switches.MaxIndex() {
+				if (!this.button_modes[this.pov_switches[A_Index].buttonstring]){
+					this.button_modes[this.pov_switches[A_Index].buttonstring] := {}
+				}
+				if (!this.button_counts[this.pov_switches[A_Index].buttonstring]){
+					this.button_counts[this.pov_switches[A_Index].buttonstring] := 1
+				} else {
+					this.button_counts[this.pov_switches[A_Index].buttonstring]++
+				}
+				this.button_modes[this.pov_switches[A_Index].buttonstring][this.pov_switches[A_Index].shiftmode] := 1
+			}
+			Loop % this.normal_buttons.MaxIndex(){
+				if (!this.button_modes[this.normal_buttons[A_Index].buttonstring]){
+					this.button_modes[this.normal_buttons[A_Index].buttonstring] := {}
+				}
+				if (!this.button_counts[this.normal_buttons[A_Index].buttonstring]){
+					this.button_counts[this.normal_buttons[A_Index].buttonstring] := 1
+				} else {
+					this.button_counts[this.normal_buttons[A_Index].buttonstring]++
+				}
+				this.button_modes[this.normal_buttons[A_Index].buttonstring][this.normal_buttons[A_Index].shiftmode] := 1
+			}
+			this.started_up := 1
+		}
 		Loop {
 			; Detect which states are active
 			sc := 0
@@ -132,6 +170,7 @@ Class UJRC_Button {
 		this.controller.normal_buttons.Insert(this)
 
 		this.state := 0
+		this.is_default := 0
 
 		this.stick := parms.stick
 		if (this.stick){
@@ -152,7 +191,32 @@ Class UJRC_Button {
 	}
 
 	Process(){
-		if (GetKeyState(this.buttonstring,"P") && this.controller.shift_states[this.shiftmode] ){
+		; Does this control match the current shift mode?
+
+		btn_state := GetKeyState(this.buttonstring,"P")
+		correct_mode := this.controller.shift_states[this.shiftmode]
+		if (this.is_default){
+			; variant being processed is default mode
+			if (this.controller.shift_states.default){
+				correct_mode := 1
+			} else if (this.controller.button_counts[this.buttonstring] == 1){
+				; this button only has a setting for default - enable button in all modes
+				correct_mode := 1
+			} else {
+				; if none of the active shift states apply to this button
+				enum := this.controller.shift_states._NewEnum()
+				correct_mode := 1
+				while enum[key, value] {
+					if (key != "default" && this.controller.shift_states[key] && this.controller.button_modes[this.buttonstring][key]){
+						correct_mode := 0
+						break
+					}
+    			}
+			}
+		} else {
+			correct_mode := this.controller.shift_states[this.shiftmode]
+		}
+		if (btn_state && correct_mode ){
 			; key is down
 			if (!this.state){
 				; previous state is up
@@ -199,6 +263,7 @@ Class UJRC_POV {
 		this.controller.pov_switches.Insert(this)
 
 		this.state := 0	; Overall state - 0 = nothing, 1 = a direction is pressed
+		this.is_default := 0
 		this.buttonstring := parms.button
 		this.state_array := [0,0,0,0] ; state of each of the 4 directions
 		this.key_array := parms.key_array
@@ -308,6 +373,12 @@ Class UJRC_Shift {
 	OnUp(){
 
 	}
+}
+
+StrLower(in){
+	out := ""
+	StringLower, out, in
+	return out
 }
 
 ; Used to hide keys from the game

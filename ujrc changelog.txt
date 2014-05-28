@@ -6,6 +6,11 @@ Key:
 = : Change / Fix
 + : Added feature
 
+1.0.2 28th May 2014
+= If none of the active shift states apply to a button, that button will be in the default state.
+  So if button 1 has shift states for "default" and "mode1", but shift mode mode2 is active...
+  ...the button will be in the "default" state as "mode2" is not associated with button 1.
+
 1.0.1 25th May 2014
 = Up Event now correctly sent for Button types
 
