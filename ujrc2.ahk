@@ -54,6 +54,8 @@ elite := New UJRC_Controller({limit_app: limit_app})				; remapping works in any
 
 elite.AddButton({type: "UJRC_Button", stick: 1, pov: 0, button: "1", shiftmode: "default", key: FIRE_1})
 elite.AddButton({type: "UJRC_Button", stick: 1, pov: 0, button: "2", shiftmode: "default", key: "2"})
+;elite.AddButton({type: "UJRC_Button", stick: 0, pov: 0, button: "q", shiftmode: "default", key: "y"})
+elite.AddButton({type: "UJRC_Button", stick: 0, pov: 0, button: "wheelup", shiftmode: "default", key: "y"})
 elite.AddButton({type: "UJRC_Button", stick: 1, pov: 0, button: "2", shiftmode: "power", key: "x"})
 elite.AddButton({type: "UJRC_Button", stick: 1, pov: 1, shiftmode: "default", key_array: ["w","d","s","a"], allow_diagonals: 0})
 elite.AddButton({type: "UJRC_Button", stick: 1, pov: 1, shiftmode: "power", key_array: ["t","h","g","f"], allow_diagonals: 1})

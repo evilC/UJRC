@@ -4,8 +4,7 @@ By evilc@evilc.com
 
 ToDo:
 * Output to vJoy
-* keyboard keys as input
-
+* Support mouse wheel input
 */
 
 SetKeyDelay,0,100
@@ -33,6 +32,7 @@ Class UJRC_Controller {
 		this.shift_states := {}
 		this.shift_state_index := []
 
+		this.limit_app := parms.limit_app
 		this.custom := {}		; space for data for extended classes
 
 		return this
@@ -67,6 +67,13 @@ Class UJRC_Controller {
 				str := parms.stick "JOY" parms.button
 			} else {
 				str := parms.button
+				limit_app := this.limit_app
+				if (limit_app){
+					key := "*" parms.button
+					Hotkey, IfWinActive, ahk_class %limit_app%
+					Hotkey, %key%, donothing
+				}
+
 			}
 			arr := {type: 0, string: str, shiftmode: parms.shiftmode, buttons: []}
 			obj := this.DoAddButton(parms)
@@ -202,6 +209,7 @@ Class UJRC_Controller {
 					this.DecideDesiredState(this.input_array[input_idx].buttons[A_Index])
 				}
 			}
+			;tooltip % json_fromobj(this.output_array)
 			
 			; Loop through outputs and set final state
 			enum := this.output_array.keymouse._NewEnum()
@@ -210,10 +218,12 @@ Class UJRC_Controller {
 				if (value.curr != value.last){
 					if (value.curr){
 						; Down event
-						Send {%key% down}
+						;Send {%key% down}
+						this.Send(key " down")
 					} else {
 						; Up event
-						Send {%key% up}
+						this.Send(key " up")
+						;Send {%key% up}
 					}
 					this.output_array.keymouse[key].last := value.curr
 				}
@@ -239,7 +249,6 @@ Class UJRC_Controller {
 			; If desired state is currently up, down overrides 
 			if (obj.input_state){
 				; Button is currently down (though not determined if correct shiftmode yet)2
-
 				if (this.shift_states[obj.shiftmode]){
 					this.output_array.keymouse[obj.key].curr := 1
 					return 1
@@ -266,7 +275,7 @@ Class UJRC_Controller {
 		;this.input_states := []
 		Loop % this.input_array.MaxIndex() {
 			input_idx := A_Index
-			st := GetKeyState(this.input_array[A_Index].string)
+			st := GetKeyState(this.input_array[A_Index].string, "P")
 			if (this.input_array[A_Index].type){
 				; POV hat
 				st := (this.PovToAngle(st))
