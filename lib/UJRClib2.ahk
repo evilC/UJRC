@@ -35,7 +35,13 @@ Class UJRC_Controller {
 		this.limit_app := parms.limit_app
 		this.custom := {}		; space for data for extended classes
 
+		global UJRC_wheel_obj
+		UJRC_wheel_obj := this
 		return this
+	}
+
+	SayHi(){
+		msgbox I am the (fat) controller
 	}
 
 	AddButton(parms){
@@ -68,10 +74,25 @@ Class UJRC_Controller {
 			} else {
 				str := parms.button
 				limit_app := this.limit_app
+				key := "*" parms.button
 				if (limit_app){
-					key := "*" parms.button
 					Hotkey, IfWinActive, ahk_class %limit_app%
-					Hotkey, %key%, donothing
+					if (parms.button == "wheelup" || parms.button == "wheeldown"){
+
+					} else {
+						Hotkey, %key%, donothing
+					}
+				} else {
+					if (parms.button == "wheelup"){
+						key := "~" key
+						Hotkey, IfWinActive
+						Hotkey, %key%, UJRC_wheel_up
+					}
+					if (parms.button == "wheeldown"){
+						key := "~" key
+						Hotkey, IfWinActive
+						Hotkey, %key%, UJRC_wheel_down
+					}
 				}
 
 			}
@@ -228,6 +249,7 @@ Class UJRC_Controller {
 					this.output_array.keymouse[key].last := value.curr
 				}
 			}
+			this.wheel_rolls := []
 			Sleep 5
 		}
 	}
@@ -248,12 +270,12 @@ Class UJRC_Controller {
 		if (!this.output_array.keymouse[obj.key].curr){
 			; If desired state is currently up, down overrides 
 			if (obj.input_state){
-				; Button is currently down (though not determined if correct shiftmode yet)2
+				; Button is currently down (though not determined if correct shiftmode yet)
 				if (this.shift_states[obj.shiftmode]){
+					; shiftmode for this button object is current
 					this.output_array.keymouse[obj.key].curr := 1
 					return 1
 				}
-				; does shift_states match anything in the obj's invalid_modes list?
 				; Check shift_states against object's invalid_modes list
 				Loop % this.shift_state_index.MaxIndex(){
 					if (this.shift_states[this.shift_state_index[A_Index]]){
@@ -366,7 +388,10 @@ Class UJRC_Controller {
 		return 0
 	}
 
-
+	OnWheel(dir){
+		this.wheel_rolls.Insert(dir)
+		;msgbox % "wheel: " dir
+	}
 }
 
 ; ======================================================== BUTTON =========================================================
@@ -546,4 +571,12 @@ json_fromobj( obj ) {
 
 ; Used to hide keys from the game
 donothing:
+	return
+
+UJRC_wheel_up:
+	UJRC_wheel_obj.OnWheel(1)
+	return
+
+UJRC_wheel_down:
+	UJRC_wheel_obj.OnWheel(-1)
 	return
