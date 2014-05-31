@@ -1,7 +1,10 @@
 /*
-UJRC - Universal Joystick Remapper Companion library v 1.0.2
+UJRC - Universal Joystick Remapper Companion library
 By evilc@evilc.com
 
+ToDo:
+* Output to vJoy
+* Support mouse wheel input
 */
 
 SetKeyDelay,0,100
@@ -15,90 +18,238 @@ SetKeyDelay,0,100
 ; Start it running using Heartbeat()
 Class UJRC_Controller {
 	__New(parms){
-		this.version := 1.0.0
+		this.version := 2.0.0
 		this.started_up := 0
-		this.button_counts := {}			; How many shift modes each button is in
-		this.button_modes := {}				; Which shift modes each button is in
-		this.limit_app := parms.limit_app
-		this.shift_states := {}
-		this.shift_buttons := []
-		this.normal_buttons := []
-		this.pov_switches := []
 
+		this.hat_directions := ["Up", "Right", "Down", "Left"]	; for debugging etc
+
+		this.input_array := []
+		this.output_array := {}
+		this.output_array.stick := []
+		this.output_array.keymouse := {}
+
+		this.shift_array := []
+		this.shift_states := {}
+		this.shift_state_index := []
+
+		this.limit_app := parms.limit_app
 		this.custom := {}		; space for data for extended classes
 
+		global UJRC_wheel_obj
+		UJRC_wheel_obj := this
 		return this
 	}
 
-	Add(parms){
+	SayHi(){
+		msgbox I am the (fat) controller
+	}
+
+	AddButton(parms){
 		parms.controller := this
 		parms.shiftmode := StrLower(parms.shiftmode)
 
+		; Register input(s) with input_array and output_array so they can be iterated
+		if (parms.pov){
+			; POV being added
+			str := parms.stick "JOYPOV"
+			arr := {type: 1, shiftmode: parms.shiftmode, string: str, allow_diagonals: parms.allow_diagonals, buttons: []}
+			Loop 4 {
+				if (parms.key_array[A_Index]){
+					p := parms
+					p.key := parms.key_array[A_Index]
+
+					
+					obj := this.DoAddButton(parms)
+					obj.string := str
+					obj.controller := this
+					arr.buttons.insert(obj)
+				}
+			}
+			; register POV for reading
+			this.input_array.insert(arr)
+		} else {
+			; Regular button being added
+			if (parms.stick){
+				str := parms.stick "JOY" parms.button
+			} else {
+				str := parms.button
+				limit_app := this.limit_app
+				key := "*" parms.button
+				if (limit_app){
+					Hotkey, IfWinActive, ahk_class %limit_app%
+					if (parms.button == "wheelup" || parms.button == "wheeldown"){
+
+					} else {
+						Hotkey, %key%, donothing
+					}
+				} else {
+					if (parms.button == "wheelup"){
+						key := "~" key
+						Hotkey, IfWinActive
+						Hotkey, %key%, UJRC_wheel_up
+					}
+					if (parms.button == "wheeldown"){
+						key := "~" key
+						Hotkey, IfWinActive
+						Hotkey, %key%, UJRC_wheel_down
+					}
+				}
+
+			}
+			arr := {type: 0, string: str, shiftmode: parms.shiftmode, buttons: []}
+			obj := this.DoAddButton(parms)
+			obj.string := str
+			obj.controller := this
+			arr.buttons.insert(obj)
+			this.input_array.insert(arr)
+		}
+	}
+
+	DoAddButton(parms){
 		; Create control object
 		tmp := parms.type
 		obj := New %tmp%(parms)
 
-		; Post creation stuff
-		if (parms.shiftmode == "default"){
-			obj.is_default := 1
+		; Add key entry to output_array
+		if (!this.output_array.keymouse[obj.key]){
+			this.output_array.keymouse[obj.key] := {curr: 0, last: 0}
 		}
-		obj.buttonstring := StrLower(obj.buttonstring)
+		return obj
+	}
 
+	AddShift(parms){
+		parms.controller := this
+		parms.shiftmode := StrLower(parms.shiftmode)
+
+		if (parms.stick){
+			if (parms.pov){
+				; POV direction as shift button
+			} else {
+				; Stick button as shift button
+				return this.DoAddShift(parms)
+			}
+		} else {
+			; keyboard / mouse key as shift button
+		}
+	}
+
+	DoAddShift(parms){
+		tmp := parms.type
+		obj := New %tmp%(parms)
+
+		if (parms.stick){
+			if (parms.pov){
+				msgbox Not Supported
+				ExitApp
+			} else {
+				str := parms.stick "JOY" parms.button
+				obj.string := str
+			}
+		} else {
+			obj.string := parms.button
+		}
+		this.shift_array.insert(obj)
+		this.shift_state_index.insert(obj.shiftmode)
+
+		return obj
 	}
 
 	Heartbeat(){
 		if (!this.started_up){
-			this.button_counts := {}
-			this.button_modes := {}
-			Loop % this.pov_switches.MaxIndex() {
-				if (!this.button_modes[this.pov_switches[A_Index].buttonstring]){
-					this.button_modes[this.pov_switches[A_Index].buttonstring] := {}
-				}
-				if (!this.button_counts[this.pov_switches[A_Index].buttonstring]){
-					this.button_counts[this.pov_switches[A_Index].buttonstring] := 1
+			; Order input_array to have all shiftmode==default items at the end
+			tmp := this.input_array
+			this.input_array := []
+			Loop % tmp.MaxIndex(){
+				input_idx := A_Index
+				if (tmp[input_idx].buttons[1].shiftmode == "default"){
+					; Give input objects a boolean check to see if they are for default shiftmode
+					tmp[input_idx].buttons[1].is_default := 1
+					tmp[input_idx].is_default := 1
+					; Do not add button(s) back in this pass
 				} else {
-					this.button_counts[this.pov_switches[A_Index].buttonstring]++
+					this.input_array.insert(tmp[input_idx])
+					tmp[input_idx].buttons[1].is_default := 0
+					tmp[input_idx].is_default := 0
 				}
-				this.button_modes[this.pov_switches[A_Index].buttonstring][this.pov_switches[A_Index].shiftmode] := 1
+				Loop % tmp[input_idx].buttons.MaxIndex(){
+					; Duplicate is_default value to all button objects in the array
+					tmp[input_idx].buttons[A_Index].is_default := tmp[input_idx].buttons[1].is_default
+				}
 			}
-			Loop % this.normal_buttons.MaxIndex(){
-				if (!this.button_modes[this.normal_buttons[A_Index].buttonstring]){
-					this.button_modes[this.normal_buttons[A_Index].buttonstring] := {}
+			Loop % tmp.MaxIndex(){
+				; Patch default button(s) in at end
+				if (tmp[input_idx].buttons[1].shiftmode == "default"){
+					this.input_array.insert(tmp[input_idx])
 				}
-				if (!this.button_counts[this.normal_buttons[A_Index].buttonstring]){
-					this.button_counts[this.normal_buttons[A_Index].buttonstring] := 1
-				} else {
-					this.button_counts[this.normal_buttons[A_Index].buttonstring]++
+			}
+			this.input_array := tmp
+
+			; Find variants (same input button, different shiftmode) of each control
+			Loop % this.input_array.MaxIndex(){
+				input_idx := A_Index
+
+				Loop % this.input_array[input_idx].buttons.MaxIndex(){
+					button_idx := A_Index
+					; default invalid_mode for each shiftmode on the object to 0
+					this.input_array[input_idx].buttons[button_idx].invalid_modes := {}
+					this.input_array[input_idx].buttons[button_idx].invalid_modes.default := !this.input_array[input_idx].is_default
 				}
-				this.button_modes[this.normal_buttons[A_Index].buttonstring][this.normal_buttons[A_Index].shiftmode] := 1
+				; Loop through each other input
+				Loop % this.input_array.MaxIndex(){
+					search_idx := A_Index
+					; Do not compare the same item with itself
+					if (search_idx != input_idx){
+						if (this.input_array[input_idx].string == this.input_array[search_idx].string){
+							; Found input match, cycle through object(s)
+							Loop % this.input_array[input_idx].buttons.MaxIndex(){
+								; Set found mode to not valid on each object
+								this.input_array[input_idx].buttons[A_Index].invalid_modes[this.input_array[search_idx].shiftmode] := 1
+							}
+						}
+					}
+				}
 			}
 			this.started_up := 1
 		}
 		Loop {
-			; Detect which states are active
-			sc := 0
-			Loop % this.shift_buttons.MaxIndex() {
-				res := this.shift_buttons[A_Index].SetState()
-				if (res){
-					;tooltip % this.shift_buttons[A_Index].shiftmode
-				}
-				sc += res
+			; Endless loop
+			; Set output_array states to 0
+			enum := this.output_array.keymouse._NewEnum()
+			while enum[key, value] {
+				this.output_array.keymouse[key].curr := 0
+			}
+			; Read status of input controls
+			this.GetInputStates()
 
+			this.GetShiftStates()
+
+			; Loop through inputs and let them set output_array to desired state
+			Loop % this.input_array.MaxIndex(){
+				input_idx := A_Index
+				Loop % this.input_array[input_idx].buttons.MaxIndex(){
+					this.DecideDesiredState(this.input_array[input_idx].buttons[A_Index])
+				}
 			}
-			if (sc){
-				this.shift_states.default := 0
-			} else {
-				; No shift states active - set default state
-				this.shift_states.default := 1
-				;tooltip % "default"
+			;tooltip % json_fromobj(this.output_array)
+			
+			; Loop through outputs and set final state
+			enum := this.output_array.keymouse._NewEnum()
+			while enum[key, value] {
+				;this.output_array.keymouse[key].curr := 
+				if (value.curr != value.last){
+					if (value.curr){
+						; Down event
+						;Send {%key% down}
+						this.Send(key " down")
+					} else {
+						; Up event
+						this.Send(key " up")
+						;Send {%key% up}
+					}
+					this.output_array.keymouse[key].last := value.curr
+				}
 			}
-			; ToDo: Process ups then downs, so order is not important.
-			Loop % this.pov_switches.MaxIndex(){
-				this.pov_switches[A_Index].Process()
-			}
-			Loop % this.normal_buttons.MaxIndex(){
-				this.normal_buttons[A_Index].Process()
-			}
+			this.wheel_rolls := []
 			Sleep 5
 		}
 	}
@@ -114,17 +265,94 @@ Class UJRC_Controller {
 		}
 	}
 
+	; obj is a button class object
+	DecideDesiredState(obj){
+		if (!this.output_array.keymouse[obj.key].curr){
+			; If desired state is currently up, down overrides 
+			if (obj.input_state){
+				; Button is currently down (though not determined if correct shiftmode yet)
+				if (this.shift_states[obj.shiftmode]){
+					; shiftmode for this button object is current
+					this.output_array.keymouse[obj.key].curr := 1
+					return 1
+				}
+				; Check shift_states against object's invalid_modes list
+				Loop % this.shift_state_index.MaxIndex(){
+					if (this.shift_states[this.shift_state_index[A_Index]]){
+						if (obj.invalid_modes[this.shift_state_index[A_Index]] != 1){
+							this.output_array.keymouse[obj.key].curr := 1
+							return 1
+						}
+					}
+				}
+			}
+		}
+		; implicit deny
+		this.output_array.keymouse[obj.key].curr := 0
+		return 0
+	}
+
+	; Gets state of all the inputs
+	GetInputStates(){
+		;this.input_states := []
+		Loop % this.input_array.MaxIndex() {
+			input_idx := A_Index
+			st := GetKeyState(this.input_array[A_Index].string, "P")
+			if (this.input_array[A_Index].type){
+				; POV hat
+				st := (this.PovToAngle(st))
+
+
+				; If not centered || (allow_diagonals is off && direction is non-even)
+				if (!st || (!this.input_array[input_idx].allow_diagonals && !Mod(st, 2))){
+					hat_off := 1
+				} else {
+					hat_off := 0
+				}
+				ang := 1
+				; Find individual states for U/D/L/R
+				Loop 4 {
+					this.input_array[input_idx].buttons[A_Index].input_state := !(hat_off || !this.PovMatchesAngle(st, ang))
+					ang += 2
+				}
+			} else {
+				; Key / Mouse / Stick button
+				this.input_array[input_idx].buttons[1].input_state := st
+			}
+
+		}
+	}
+
+	; Get state of all the shift buttons
+	GetShiftStates(){
+		this.shift_states := {}
+		ctr := 0
+
+		Loop % this.shift_array.MaxIndex() {
+			st := GetKeyState(this.shift_array[A_Index].string,"P")
+			this.shift_states[this.shift_array[A_Index].shiftmode] := st
+			if (st){
+				ctr++
+			}
+		}
+		if (ctr){
+			this.shift_states.default := 0
+		} else {
+			this.shift_states.default := 1
+		}
+	}
+
 	; Shorthand way of querying POV
 	GetPovDir(pov_button){
 		return this.PovToAngle(GetKeyState(pov_button,"P"))
 	}
 
-	; Converts an AHK POV (degrees style) value to 0-7 (0 being up, going clockwise)
+	; Converts an AHK POV (degrees style) value to 1-8 (0 being up, going clockwise), or 0 for no angle
 	PovToAngle(pov){
 		if (pov == -1){
-			return -1
+			return 0
 		} else {
-			return round(pov/4500)
+			return round(pov/4500) + 1
 		}
 	}
 
@@ -160,34 +388,24 @@ Class UJRC_Controller {
 		return 0
 	}
 
-
+	OnWheel(dir){
+		this.wheel_rolls.Insert(dir)
+		;msgbox % "wheel: " dir
+	}
 }
 
+; ======================================================== BUTTON =========================================================
 ; A Regular Button. Can have multiple shifted states
 Class UJRC_Button {
 	__New(parms){
-		this.controller := parms.controller
-		this.controller.normal_buttons.Insert(this)
-
-		this.state := 0
-		this.is_default := 0
-
-		this.stick := parms.stick
-		if (this.stick){
-			this.buttonstring := parms.stick "Joy" parms.button
-		} else {
-			this.buttonstring := parms.button
-			limit_app := this.controller.limit_app
-			if (limit_app){
-				key := "*" this.buttonstring
-				Hotkey, IfWinActive, ahk_class %limit_app%
-				Hotkey, %key%, donothing
-			}
-		}
-		this.shiftmode := parms.shiftmode
+		this.input_state := 0
 		this.key := parms.key
-
+		this.shiftmode := parms.shiftmode
 		return this 
+	}
+
+	SayHi(){
+		msgbox I am a button
 	}
 
 	Process(){
@@ -253,94 +471,16 @@ Class UJRC_Button {
 	}
 }
 
-; A POV Hat / D-Pad. Can have multiple shifted states
-; Parameters:
-; key_array: what keys to hit for each of the 4 directions (up,right,down,left)
-; eg: ["e","3","q","1"] for l/r = left/right panel and u/d = next/prev tab
-Class UJRC_POV {
-	__New(parms){
-		this.controller := parms.controller
-		this.controller.pov_switches.Insert(this)
-
-		this.state := 0	; Overall state - 0 = nothing, 1 = a direction is pressed
-		this.is_default := 0
-		this.buttonstring := parms.button
-		this.state_array := [0,0,0,0] ; state of each of the 4 directions
-		this.key_array := parms.key_array
-		this.shiftmode := parms.shiftmode
-
-		this.allow_diagonals := parms.allow_diagonals
-		this.diagonal_mask := [1,0,1,0,1,0,1,0]
-
-		return this
-	}
-
-	Process(){
-		dir := this.controller.GetPovDir(this.buttonstring)
-		if (dir == -1){
-			this.state := 0
-		} else {
-			this.state := 1
-		}
-		dir += 1
-		ang := 1
-
-		Loop 4 {
-			diagonal_check := this.allow_diagonals || this.diagonal_mask[dir]
-			; Check the four cardinal directions to see if current direction matches
-			if (this.controller.shift_states[this.shiftmode] && dir && this.controller.PovMatchesAngle(dir, ang) && diagonal_check){
-				; The button is "held"
-				if (!this.state_array[A_Index]){
-					; key is currently up
-					if (this.BeforeDown(A_Index)){
-						;tooltip % key
-						;key := this.key_array[A_Index] " down"
-						;Send {%key%}
-						this.controller.Send(this.key_array[A_Index] " down")
-						this.state_array[A_Index] := 1
-					}
-				}
-			} else {
-				; The button is not held
-				if (this.state_array[A_Index]){
-					; key is currently down
-					if (this.BeforeUp(A_Index)){
-						;key := this.key_array[A_Index] " up"
-						;Send {%key%}
-						this.controller.Send(this.key_array[A_Index] " up")
-						this.state_array[A_Index] := 0
-					}
-				}
-			}
-			; Jump to next cardinal direction
-			ang += 2
-		}
-	}
-
-	; Methods intended to be extended
-	; Called before down
-	; return 1 to allow keypress, 0 to deny
-	BeforeDown(dir){
-		return 1
-	}
-
-	BeforeUp(dir){
-		return 1
-	}
-}
-
+; ======================================================== SHIFT =========================================================
 ; A Shift state. Can put Buttons / POVs in other states
 Class UJRC_Shift {
 	__New(parms){
-		this.controller := parms.controller
-		this.controller.shift_buttons.Insert(this)
-
-		this.state := 0
-		this.buttonstring := parms.button
 		this.shiftmode := parms.shiftmode
-
-		this.controller.shift_states[this.shiftmode] := 0
 		return this
+	}
+
+	SayHi(){
+		msgbox I am a shift state
 	}
 
 	; Sets the state of the controller's shift_states array to reflect status of this Shift button
@@ -381,6 +521,62 @@ StrLower(in){
 	return out
 }
 
+; Copyright © 2013 VxE. All rights reserved.
+
+; Serialize an object as JSON-like text OR format a string for inclusion therein.
+; NOTE: scientific notation is treated as a string and hexadecimal as a number.
+; NOTE: UTF-8 sequences are encoded as-is, NOT as their intended codepoint.
+json_fromobj( obj ) {
+
+	If IsObject( obj )
+	{
+		isarray := 0 ; an empty object could be an array... but it ain't, says I
+		for key in obj
+			if ( key != ++isarray )
+			{
+				isarray := 0
+				Break
+			}
+
+		for key, val in obj
+			str .= ( A_Index = 1 ? "" : "," ) ( isarray ? "" : json_fromObj( key ) ":" ) json_fromObj( val )
+
+		return isarray ? "[" str "]" : "{" str "}"
+	}
+	else if obj IS NUMBER
+		return obj
+;	else if obj IN null,true,false ; AutoHotkey does not natively distinguish these
+;		return obj
+
+	; Encode control characters, starting with backslash.
+	StringReplace, obj, obj, \, \\, A
+	StringReplace, obj, obj, % Chr(08), \b, A
+	StringReplace, obj, obj, % A_Tab, \t, A
+	StringReplace, obj, obj, `n, \n, A
+	StringReplace, obj, obj, % Chr(12), \f, A
+	StringReplace, obj, obj, `r, \r, A
+	StringReplace, obj, obj, ", \", A
+	StringReplace, obj, obj, /, \/, A
+	While RegexMatch( obj, "[^\x20-\x7e]", key )
+	{
+		str := Asc( key )
+		val := "\u" . Chr( ( ( str >> 12 ) & 15 ) + ( ( ( str >> 12 ) & 15 ) < 10 ? 48 : 55 ) )
+				. Chr( ( ( str >> 8 ) & 15 ) + ( ( ( str >> 8 ) & 15 ) < 10 ? 48 : 55 ) )
+				. Chr( ( ( str >> 4 ) & 15 ) + ( ( ( str >> 4 ) & 15 ) < 10 ? 48 : 55 ) )
+				. Chr( ( str & 15 ) + ( ( str & 15 ) < 10 ? 48 : 55 ) )
+		StringReplace, obj, obj, % key, % val, A
+	}
+	return """" obj """"
+} ; json_fromobj( obj )
+
 ; Used to hide keys from the game
 donothing:
+	return
+
+UJRC_wheel_up:
+	UJRC_wheel_obj.OnWheel(1)
+	return
+
+UJRC_wheel_down:
+	UJRC_wheel_obj.OnWheel(-1)
 	return

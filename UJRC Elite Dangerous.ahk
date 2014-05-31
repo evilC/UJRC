@@ -1,6 +1,5 @@
 /*
-Thrustmaster T-Flight HOTAS (X) / Top Gun Afterburner II Configuration Script for EDTWeak / UJRC
-
+UJRC Configuration Script for Elite Dangerous
 */
 
 SetKeyDelay,0,100
@@ -141,4 +140,4 @@ elite.Heartbeat()
 ; FOOTER SECTION
 
 ; KEEP THIS AT THE END!!
-#Include lib\UJRClib2.ahk		; If you have the library in the same folder as your macro, use this
+#Include lib\UJRClib.ahk		; If you have the library in the same folder as your macro, use this

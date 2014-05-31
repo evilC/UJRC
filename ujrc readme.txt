@@ -7,7 +7,7 @@ Usage:
 1) Decide which buttons you wish to have shifted / unshifted modes for and which buttons you wish to use for shift.
 2) Unbind ALL these buttons in your game by clicking on them and tapping Escape
 3) Start with an example configuration script and rename it to something else ending in .ahk
-	eg Rename "EDTweak T-Flight HOTAS.ahk" to "MyGame - MyJoystick.ahk"
+	eg Rename "UJRC Elite Dangerous" to "Elite - MyJoystick.ahk"
 4) Edit the configuration script to configure your joystick as required.
 
 Notes:
