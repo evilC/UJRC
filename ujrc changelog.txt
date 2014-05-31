@@ -6,6 +6,21 @@ Key:
 = : Change / Fix
 + : Added feature
 
+2.0.0 31st May 2014
+* Major rewrite
+= Syntax changed a little, so Configuration Scripts are not 100% backwards compatible
+  Add() has changet to either AddButton() or AddShift()
+= If there is a shift state which is not used by a button, then that shift state will no longer affect that button.
+  eg you have a button which has no setting for "power" shift. Holding power shift will not stop that button from executing it's default action
+= Improved handling for output key states.
+  Only one key down or key up event is sent per *output* key per cycle.
+  UJRC will no longer press and release the same button multiple times per loop, no matter what.
+= Removed EDTweak from package - no longer required.
++ All key names in sample Elite script now match with in-game names
+  Added most key names found in Alpha 4.1
++ Sample GIMP XCF image included for making layout images.
++ Layout image included for sample Elite layout
+
 1.0.2 28th May 2014
 = If none of the active shift states apply to a button, that button will be in the default state.
   So if button 1 has shift states for "default" and "mode1", but shift mode mode2 is active...
