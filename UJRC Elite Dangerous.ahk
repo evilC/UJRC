@@ -88,7 +88,6 @@ HEADTRACKER_KEY := "F9"			; Default for TrackIR
 ;elite := New UJRC_Controller({limit_app: "fWin32Utils"})	; limit keys to elite dangerous
 ;elite := New UJRC_Controller({limit_app: "Notepad"})		; limit keys to Notepad (testing mode)
 elite := New UJRC_Controller({limit_app: limit_app})				; remapping works in any application. Keys are not hidden in this mode
-elite.init()
 
 ; Configure setup of your Joystick here
 
