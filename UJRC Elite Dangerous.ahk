@@ -98,21 +98,21 @@ elite.init()
 
 ; Thrustmaster T-Flight HOTAS / Top Gun Afterburner config -------------------------------------------------------------------------------------------------------------------------------
 
-; Trigger - default: Fire 1, targ1 mode: Next Fire group, power mode: increase sensor range
+; Button 1 - default: Fire 1, targ1 mode: Next Fire group, power mode: increase sensor range
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "1", shiftmode: "default", key: PRIMARY_FIRE})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "1", shiftmode: "targ1", key: CYCLE_NEXT_FIRE_GROUP})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "1", shiftmode: "targ2", key: INCREASE_SENSOR_RANGE})
 
-; Secondary Fire 2 (Yellow Stripes) button - default: fire 2, targ1 mode: Deploy Hard Points
+; Button 2 - Yellow Stripes button - default: fire 2, targ1 mode: Deploy Hard Points
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "2", shiftmode: "default", key: SECONDARY_FIRE})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "2", shiftmode: "power", key: DEPLOY_HARD_POINTS})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "2", shiftmode: "targ2", key: DECREASE_SENSOR_RANGE})
 
-; Side Button by Trigger - Flight Assist / Reverse
+; Button 3 - Side Button by Trigger - Flight Assist / Reverse
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "3", shiftmode: "default", key: DISABLE_FLIGHT_ASSIST})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "3", shiftmode: "power", key: REVERSE_THROTTLE})
 
-; Side Button by Secondary Fire - default: Engine Boost, power mode: Silent Running, targ2 mode: Deploy Heat Sink
+; Button 4 - Side Button by Secondary Fire - default: Engine Boost, power mode: Silent Running, targ2 mode: Deploy Heat Sink
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "4", shiftmode: "default", key: ENGINE_BOOST})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "4", shiftmode: "power", key: TOGGLE_SILENT_RUNNING})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "4", shiftmode: "targ2", key: DEPLOY_HEAT_SINK})
