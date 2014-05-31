@@ -72,10 +72,12 @@ SYSTEMS_PANEL := "2"
 SENSORS_PANEL := "3"
 
 ; INTERFACE MODE
-UI_PANEL_UP := ""
-UI_PANEL_DOWN := ""
-UI_PANEL_LEFT := ""
-UI_PANEL_DOWN := ""
+UI_PANEL_UP := "w"
+UI_PANEL_RIGHT := "d"
+UI_PANEL_LEFT := "a"
+UI_PANEL_DOWN := "s"
+NEXT_PANEL_TAB := "e"
+PREVIOUS_PANEL_TAB := "q"
 
 ; HEADLOOK MODE
 RESET_HEAD_LOOK := ""
@@ -115,23 +117,21 @@ elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "3", shif
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "4", shiftmode: "default", key: ENGINE_BOOST})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "4", shiftmode: "power", key: TOGGLE_SILENT_RUNNING})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "4", shiftmode: "targ2", key: DEPLOY_HEAT_SINK})
+elite.AddShift({type: "UJRC_Shift", stick: STICK_ID, pov: 0,  button: "8", shiftmode: "ui_mode"})	; UJRC UI access method - like ED's but UI shift + up/down does tabs
+;elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "8", shiftmode: "default", key: UI_PANEL_FOCUS})	; Default UI access method.
 
 ; Add Standard UJRC Shift Controls
 elite.AddShift({type: "UJRC_Shift", stick: STICK_ID, pov: 0,  button: "5", shiftmode: "power"})
 elite.AddShift({type: "UJRC_Shift", stick: STICK_ID, pov: 0,  button: "7", shiftmode: "targ1"})
 elite.AddShift({type: "UJRC_Shift", stick: STICK_ID, pov: 0,  button: "6", shiftmode: "targ2"})
 
-elite.AddShift({type: "UJRC_Shift", stick: STICK_ID, pov: 0,  button: "8", shiftmode: "tir_ui"})	; TrackIR custom UI shift+L/R hat = tabs
-;elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "8", shiftmode: "default", key: UI_PANEL_FOCUS})	; Default UI mode shift keu
-
 ; POVs / Dpads
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "default", key_array: ["w","d","s","a"], allow_diagonals: 1})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "power", key_array: [DIVERT_POWER_TO_ENGINES,DIVERT_POWER_TO_WEAPONS,BALANCE_POWER_DISTRIBUTION,DIVERT_POWER_TO_SYSTEMS], allow_diagonals: 0})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "targ1", key_array: [SELECT_TARGET_AHEAD,CYCLE_NEXT_SUBSYSTEM,SELECT_HIGHEST_THREAT,CYCLE_PREVIOUS_SUBSYSTEM], allow_diagonals: 0})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "targ2", key_array: [CYCLE_NEXT_SHIP,CYCLE_PREVIOUS_HOSTILE_SHIP,CYCLE_PREVIOUS_SHIP,CYCLE_PREVIOUS_HOSTILE_SHIP], allow_diagonals: 0})
-
-; UI mode POV / DPad - TrackIR (panel tab only)
-elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "tir_ui", key_array: [NEXT_PANEL_TAB,NEXT_PANEL_TAB,PREVIOUS_PANEL_TAB,PREVIOUS_PANEL_TAB], allow_diagonals: 0})
+; UI mode POV / DPad
+elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "ui_mode", key_array: [NEXT_PANEL_TAB,SENSORS_PANEL,PREVIOUS_PANEL_TAB,TARGET_PANEL], allow_diagonals: 0})
 
 elite.Heartbeat()
 

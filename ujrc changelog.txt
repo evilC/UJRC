@@ -6,6 +6,10 @@ Key:
 = : Change / Fix
 + : Added feature
 
+2.0.1 31st May 2014
+= TrackIR mode fixed
+= TrackIR UI mode and normal mode merged. script now simpler
+
 2.0.0 31st May 2014
 * Major rewrite
 = Syntax changed a little, so Configuration Scripts are not 100% backwards compatible
