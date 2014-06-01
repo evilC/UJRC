@@ -3,6 +3,8 @@ UJRC - Universal Joystick Remapper Companion library
 By evilc@evilc.com
 
 ToDo:
+* Duplicate bindings do not work
+  binding the same key twice in a hat does not work for the 2nd item
 * Output to vJoy
 * Support mouse wheel input
 */
@@ -18,7 +20,7 @@ SetKeyDelay,0,100
 ; Start it running using Heartbeat()
 Class UJRC_Controller {
 	__New(parms){
-		this.version := 2.0.0
+		this.version := 2.0.2
 		this.started_up := 0
 
 		this.hat_directions := ["Up", "Right", "Down", "Left"]	; for debugging etc

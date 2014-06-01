@@ -106,7 +106,7 @@ elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "1", shif
 
 ; Button 2 - Yellow Stripes button - default: fire 2, targ1 mode: Deploy Hard Points
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "2", shiftmode: "default", key: SECONDARY_FIRE})
-elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "2", shiftmode: "power", key: DEPLOY_HARD_POINTS})
+elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "2", shiftmode: "targ1", key: DEPLOY_HARD_POINTS})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 0, button: "2", shiftmode: "targ2", key: DECREASE_SENSOR_RANGE})
 
 ; Button 3 - Side Button by Trigger - Flight Assist / Reverse
@@ -129,7 +129,7 @@ elite.AddShift({type: "UJRC_Shift", stick: STICK_ID, pov: 0,  button: "6", shift
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "default", key_array: ["w","d","s","a"], allow_diagonals: 1})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "power", key_array: [DIVERT_POWER_TO_ENGINES,DIVERT_POWER_TO_WEAPONS,BALANCE_POWER_DISTRIBUTION,DIVERT_POWER_TO_SYSTEMS], allow_diagonals: 0})
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "targ1", key_array: [SELECT_TARGET_AHEAD,CYCLE_NEXT_SUBSYSTEM,SELECT_HIGHEST_THREAT,CYCLE_PREVIOUS_SUBSYSTEM], allow_diagonals: 0})
-elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "targ2", key_array: [CYCLE_NEXT_SHIP,CYCLE_PREVIOUS_HOSTILE_SHIP,CYCLE_PREVIOUS_SHIP,CYCLE_PREVIOUS_HOSTILE_SHIP], allow_diagonals: 0})
+elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "targ2", key_array: [CYCLE_NEXT_SHIP,CYCLE_NEXT_HOSTILE_SHIP,CYCLE_PREVIOUS_SHIP,CYCLE_PREVIOUS_HOSTILE_SHIP], allow_diagonals: 0})
 ; UI mode POV / DPad
 elite.AddButton({type: "UJRC_Button", stick: STICK_ID, pov: 1, shiftmode: "ui_mode", key_array: [NEXT_PANEL_TAB,SENSORS_PANEL,PREVIOUS_PANEL_TAB,TARGET_PANEL], allow_diagonals: 0})
 

@@ -6,6 +6,10 @@ Key:
 = : Change / Fix
 + : Added feature
 
+2.0.2 1st Jun 2014
+= Corrections to Elite sample template
+  Various buttons in template were not configured correctly
+
 2.0.1 31st May 2014
 = TrackIR mode fixed
 = TrackIR UI mode and normal mode merged. script now simpler
